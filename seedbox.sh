@@ -323,7 +323,10 @@ service nginx start
 
 #TODO: IPTABLES
 
-sudo -s -- <<EOF 
-
-
-EOF
+#rutorrent
+#TODO: Configure it
+wget https://github.com/Novik/ruTorrent/archive/master.zip
+unzip master.zip
+mv ruTorrent-master /var/www/rutorrent
+chown www-data:www-data -R /var/www/rutorrent
+rm master.zip
