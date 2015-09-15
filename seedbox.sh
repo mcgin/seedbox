@@ -193,6 +193,8 @@ update-rc.d rtorrent defaults 99
 
 adduser --system --no-create-home --group --shell /sbin/nologin nginx
 
+#https://www.linode.com/docs/websites/nginx/how-to-install-nginx-on-debian-7-wheezy
+
 #wget -O /tmp/nginx-1.8.0.tar.gz http://nginx.org/download/nginx-1.8.0.tar.gz
 #tar -xf /tmp/nginx-1.8.0.tar.gz -C /tmp
 #pushd /tmp/nginx-1.8.0
@@ -200,10 +202,11 @@ adduser --system --no-create-home --group --shell /sbin/nologin nginx
 #--user=nginx                          \
 #--group=nginx                         \
 #--prefix=/etc/nginx                   \
-#--sbin-path=/usr/sbin/nginx           \
+##--sbin-path=/usr/sbin/nginx           \
 #--conf-path=/etc/nginx/nginx.conf     \
 #--pid-path=/var/run/nginx.pid         \
 #--lock-path=/var/run/nginx.lock       \
+#--with-ipv6                           \
 #--error-log-path=/var/log/nginx/error.log \
 #--http-log-path=/var/log/nginx/access.log \
 #--with-http_gzip_static_module        \
@@ -212,7 +215,6 @@ adduser --system --no-create-home --group --shell /sbin/nologin nginx
 #--with-pcre                           \
 #--with-file-aio                       \
 #--without-http_uwsgi_module           \
-#--without-http_autoindex_module       \
 #--without-http_fastcgi_module
 #make
 #make install
