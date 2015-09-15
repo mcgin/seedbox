@@ -1,13 +1,20 @@
+#!/bin/bash
+
 while getopts "p:u:" opt; do
   case $opt in
     p)
-	  PASSWORD=$OPTARG;;
+        PASSWORD=$OPTARG;;
     u)
-      USERNAME=$OPTARG;;
+		USERNAME=$OPTARG;;
   esac
 done
 
 set -e
+
+if [ -z "$USERNAME" ] || [ -z "$PASSWORD" ]; then
+  echo "usage: $0 -p PASSWORD -u USERNAME"
+  exit
+fi
 
 apt-get -y update && apt-get -y upgrade
 
@@ -38,7 +45,7 @@ echo "Protocol 2" >>/etc/ssh/sshd_config
 service ssh reload
 
 #Install dependencies
-apt-get install -y build-essential unzip nginx git subversion autoconf screen g++ gcc ntp curl comerr-dev pkg-config cfv libtool libssl-dev libncurses5-dev ncurses-term libsigc++-2.0-dev libcppunit-dev libcurl3 libcurl4-openssl-dev libpcre3-dev libpcre3
+apt-get install -y build-essential unzip git subversion autoconf screen g++ gcc ntp curl comerr-dev pkg-config cfv libtool libssl-dev libncurses5-dev ncurses-term libsigc++-2.0-dev libcppunit-dev libcurl3 libcurl4-openssl-dev libpcre3-dev libpcre3
 
 #Install xmlrpc
 svn co -q https://svn.code.sf.net/p/xmlrpc-c/code/stable /tmp/xmlrpc-c
@@ -184,54 +191,38 @@ sed -i "/^USER=BOOM/c\USER=$USERNAME" /etc/init.d/rtorrent
 chmod +x /etc/init.d/rtorrent
 update-rc.d rtorrent defaults 99
 
-
-##TODO create nginx user?
-
 ## nginx 
 #https://www.digitalocean.com/community/tutorials/how-to-compile-nginx-from-source-on-a-centos-6-4-x64-vps
 #http://www.juanjchong.com/2014/setting-up-rtorrentrutorrent-on-ubuntu-14-04-using-ngnix/
+#https://www.linode.com/docs/websites/nginx/how-to-install-nginx-on-debian-7-wheezy
 
 adduser --system --no-create-home --group --shell /sbin/nologin nginx
 
-#https://www.linode.com/docs/websites/nginx/how-to-install-nginx-on-debian-7-wheezy
-
-#wget -O /tmp/nginx-1.8.0.tar.gz http://nginx.org/download/nginx-1.8.0.tar.gz
-#tar -xf /tmp/nginx-1.8.0.tar.gz -C /tmp
-#pushd /tmp/nginx-1.8.0
-#./configure \
-#--user=nginx                          \
-#--group=nginx                         \
-#--prefix=/etc/nginx                   \
-##--sbin-path=/usr/sbin/nginx           \
-#--conf-path=/etc/nginx/nginx.conf     \
-#--pid-path=/var/run/nginx.pid         \
-#--lock-path=/var/run/nginx.lock       \
-#--with-ipv6                           \
-#--error-log-path=/var/log/nginx/error.log \
-#--http-log-path=/var/log/nginx/access.log \
-#--with-http_gzip_static_module        \
-#--with-http_stub_status_module        \
-#--with-http_ssl_module                \
-#--with-pcre                           \
-#--with-file-aio                       \
-#--without-http_uwsgi_module           \
-#--without-http_fastcgi_module
-#make
-#make install
-#popd
-#rm -r /tmp/nginx-1.8.0*
-
-#  nginx path prefix: "/etc/nginx"
-#  nginx binary file: "/usr/sbin/nginx"
-#  nginx configuration prefix: "/etc/nginx"
-#  nginx configuration file: "/etc/nginx/nginx.conf"
-#  nginx pid file: "/var/run/nginx.pid"
-#  nginx error log file: "/var/log/nginx/error.log"
-#  nginx http access log file: "/var/log/nginx/access.log"
-#  nginx http client request body temporary files: "client_body_temp"
-#  nginx http proxy temporary files: "proxy_temp"
-#  nginx http scgi temporary files: "scgi_temp"
-
+wget -O /tmp/nginx-1.8.0.tar.gz http://nginx.org/download/nginx-1.8.0.tar.gz
+tar -xf /tmp/nginx-1.8.0.tar.gz -C /tmp
+pushd /tmp/nginx-1.8.0
+./configure \
+--user=nginx                          \
+--group=nginx                         \
+--prefix=/etc/nginx                   \
+--sbin-path=/usr/sbin/nginx           \
+--conf-path=/etc/nginx/nginx.conf     \
+--pid-path=/var/run/nginx.pid         \
+--lock-path=/var/run/nginx.lock       \
+--with-ipv6                           \
+--error-log-path=/var/log/nginx/error.log \
+--http-log-path=/var/log/nginx/access.log \
+--with-http_gzip_static_module        \
+--with-http_stub_status_module        \
+--with-http_ssl_module                \
+--with-pcre                           \
+--with-file-aio                       \
+--without-http_uwsgi_module           \
+--without-http_fastcgi_module
+make
+make install
+popd
+rm -r /tmp/nginx-1.8.0*
 
 ## TODO: Configure nginx
 #http://wiki.nginx.org/HttpScgiModule
@@ -249,6 +240,17 @@ addgroup nginx www-data
 ## Star nginx on restart
 #wget -O /etc/init.d/nginx https://gist.github.com/sairam/5892520/raw/b8195a71e944d46271c8a49f2717f70bcd04bf1a/etc-init.d-nginx
 
+#  nginx path prefix: "/etc/nginx"
+#  nginx binary file: "/usr/sbin/nginx"
+#  nginx configuration prefix: "/etc/nginx"
+#  nginx configuration file: "/etc/nginx/nginx.conf"
+#  nginx pid file: "/var/run/nginx.pid"
+#  nginx error log file: "/var/log/nginx/error.log"
+#  nginx http access log file: "/var/log/nginx/access.log"
+#  nginx http client request body temporary files: "client_body_temp"
+#  nginx http proxy temporary files: "proxy_temp"
+#  nginx http scgi temporary files: "scgi_temp"
+
 cat <<'EOF' > /etc/init.d/nginx
 #! /bin/sh
  
@@ -263,7 +265,7 @@ cat <<'EOF' > /etc/init.d/nginx
 ### END INIT INFO
  
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-DAEMON=/usr/local/sbin/nginx
+DAEMON=/usr/sbin/nginx
 NAME=nginx
 DESC=nginx
  
@@ -281,33 +283,33 @@ set -e
 case "$1" in
   start)
     echo -n "Starting $DESC: "
-    start-stop-daemon --start --quiet --pidfile /usr/local/nginx/logs/$NAME.pid \
+    start-stop-daemon --start --quiet --pidfile /var/run/$NAME.pid \
         --exec $DAEMON -- $DAEMON_OPTS || true
     echo "$NAME."
     ;;
   stop)
     echo -n "Stopping $DESC: "
-    start-stop-daemon --stop --quiet --pidfile /usr/local/nginx/logs/$NAME.pid \
+    start-stop-daemon --stop --quiet --pidfile /var/run/$NAME.pid \
         --exec $DAEMON || true
     echo "$NAME."
     ;;
   restart|force-reload)
     echo -n "Restarting $DESC: "
     start-stop-daemon --stop --quiet --pidfile \
-        /usr/local/nginx/logs/$NAME.pid --exec $DAEMON || true
+        /var/run/$NAME.pid --exec $DAEMON || true
     sleep 1
     start-stop-daemon --start --quiet --pidfile \
-        /usr/local/nginx/logs/$NAME.pid --exec $DAEMON -- $DAEMON_OPTS || true
+        /var/run/$NAME.pid --exec $DAEMON -- $DAEMON_OPTS || true
     echo "$NAME."
     ;;
   reload)
       echo -n "Reloading $DESC configuration: "
-      start-stop-daemon --stop --signal HUP --quiet --pidfile /usr/local/nginx/logs/$NAME.pid \
+      start-stop-daemon --stop --signal HUP --quiet --pidfile /var/run/$NAME.pid \
           --exec $DAEMON || true
       echo "$NAME."
       ;;
   status)
-      status_of_proc -p /usr/local/nginx/logs/$NAME.pid "$DAEMON" nginx && exit 0 || exit $?
+      status_of_proc -p /var/run/$NAME.pid "$DAEMON" nginx && exit 0 || exit $?
       ;;
   *)
     N=/etc/init.d/$NAME
