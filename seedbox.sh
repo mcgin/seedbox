@@ -1,4 +1,5 @@
 #!/bin/bash
+#wget --no-check-certificate https://raw.githubusercontent.com/mcgin/seedbox/master/seedbox.sh
 
 while getopts "p:u:" opt; do
   case $opt in
