@@ -45,7 +45,7 @@ echo "Protocol 2" >>/etc/ssh/sshd_config
 service ssh reload
 
 #Install dependencies
-apt-get install -y build-essential unzip git subversion autoconf screen g++ gcc ntp curl comerr-dev pkg-config cfv libtool libssl-dev libncurses5-dev ncurses-term libsigc++-2.0-dev libcppunit-dev libcurl3 libcurl4-openssl-dev libpcre3-dev libpcre3
+apt-get install -y build-essential unzip git subversion autoconf screen g++ gcc ntp curl comerr-dev pkg-config cfv libtool libssl-dev libncurses5-dev ncurses-term libsigc++-2.0-dev libcppunit-dev libcurl3 libcurl4-openssl-dev libpcre3-dev libpcre3 php5-cli php5-fpm
 
 #Install xmlrpc
 svn co -q https://svn.code.sf.net/p/xmlrpc-c/code/stable /tmp/xmlrpc-c
@@ -217,8 +217,7 @@ pushd /tmp/nginx-1.8.0
 --with-http_ssl_module                \
 --with-pcre                           \
 --with-file-aio                       \
---without-http_uwsgi_module           \
---without-http_fastcgi_module
+--without-http_uwsgi_module
 make
 make install
 popd
@@ -323,6 +322,12 @@ EOF
 
 chmod +x /etc/init.d/nginx
 update-rc.d nginx defaults 99
+
+echo "fastcgi_buffer_size 128k;" >>/etc/nginx/fastcgi.conf
+echo "fastcgi_buffers 4 256k;" >>/etc/nginx/fastcgi.conf
+echo "fastcgi_busy_buffers_size 256k;" >>/etc/nginx/fastcgi.conf
+
+
 service nginx start
 
 #TODO: IPTABLES
