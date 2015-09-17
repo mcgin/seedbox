@@ -51,6 +51,12 @@ mkdir /var/run/rtorrent
 mkdir /var/log/rtorrent
 chown -R seeder1:seeder1 /var/run/rtorrent
 chown -R seeder1:seeder1 /var/log/rtorrent
+chmod g+s /var/run/rtorrent
+chmod g+s /var/log/rtorrent
+
+
+echo "cgi.fix_pathinfo=0" >> /etc/php5/fpm/php.ini
+service php5-fpm restart
 
 #Install xmlrpc
 svn co -q https://svn.code.sf.net/p/xmlrpc-c/code/stable /tmp/xmlrpc-c
@@ -347,3 +353,7 @@ unzip master.zip
 mv ruTorrent-master /var/www/rutorrent
 chown www-data:www-data -R /var/www/rutorrent
 rm master.zip
+
+sed -i "/^[[:space:]]*\$scgi_port/c\$scgi_port = 0;" /var/www/rutorrent/conf/config.php
+sed -i "/^[[:space:]]*\$scgi_host/c\$scgi_host = \"unix:///var/run/rtorrent/rpc.socket\";" /var/www/rutorrent/conf/config.php
+
