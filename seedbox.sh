@@ -46,7 +46,7 @@ echo "Protocol 2" >>/etc/ssh/sshd_config
 service ssh reload
 
 #Install dependencies
-apt-get install -y build-essential unzip git subversion autoconf screen g++ gcc ntp curl comerr-dev pkg-config cfv libtool libssl-dev libncurses5-dev ncurses-term libsigc++-2.0-dev libcppunit-dev libcurl3 libcurl4-openssl-dev libpcre3-dev libpcre3 php5-cli php5-fpm
+apt-get install -y build-essential mediainfo unzip git subversion autoconf screen g++ gcc ntp curl comerr-dev pkg-config cfv libtool libssl-dev libncurses5-dev ncurses-term libsigc++-2.0-dev libcppunit-dev libcurl3 libcurl4-openssl-dev libpcre3-dev libpcre3 php5-cli php5-fpm
 mkdir /var/run/rtorrent
 mkdir /var/log/rtorrent
 chown -R seeder1:seeder1 /var/run/rtorrent
