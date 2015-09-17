@@ -113,7 +113,7 @@ encryption = allow_incoming,enable_retry,prefer_plaintext
 dht = disable
 peer_exchange = no
 scgi_local = /var/run/rtorrent/rpc.socket
-schedule = chmod,0,0,"execute=chmod,777,/var/run/rtorrent/rpc.socket
+schedule = chmod,0,0,"execute=chmod,777,/var/run/rtorrent/rpc.socket"
 EOF
 
 chown -R $USERNAME:$USERNAME /home/$USERNAME/.rtorrent.rc
