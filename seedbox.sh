@@ -357,3 +357,48 @@ rm master.zip
 sed -i "/^[[:space:]]*\$scgi_port/c\$scgi_port = 0;" /var/www/rutorrent/conf/config.php
 sed -i "/^[[:space:]]*\$scgi_host/c\$scgi_host = \"unix:///var/run/rtorrent/rpc.socket\";" /var/www/rutorrent/conf/config.php
 
+cat <<'EOF' > /etc/nginx/nginx.conf
+worker_processes  1;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    sendfile        on;
+
+    keepalive_timeout  65;
+
+    server {
+        listen       80;
+        server_name  localhost ;
+
+        location / {
+            root   /var/www/rutorrent;
+            index  index.html index.htm;
+        }
+        location ~ [^/]\.php(/|$) {
+                fastcgi_split_path_info ^(.+?\.php)(/.*)$;
+                fastcgi_pass unix:/var/run/php5-fpm.sock;
+                fastcgi_index index.php;
+                fastcgi_param  SCRIPT_FILENAME  /var/www/rutorrent$fastcgi_script_name;
+                include fastcgi_params;
+        }
+
+        location /RPC2 {
+               include scgi_params;
+               scgi_pass unix:/var/run/rtorrent/rpc.socket;
+               scgi_param SCRIPT_NAME /RPC2;
+        }
+
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   html;
+        }
+    }
+}
+EOF
+service nginx reload
