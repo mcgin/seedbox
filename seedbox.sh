@@ -102,7 +102,8 @@ use_udp_trackers = yes
 encryption = allow_incoming,enable_retry,prefer_plaintext
 dht = disable
 peer_exchange = no
-scgi_port = 127.0.0.1:5000
+scgi_local = /var/run/rtorrent/rpc.socket
+schedule = chmod,0,0,"execute=chmod,777,/var/run/rtorrent/rpc.socket
 EOF
 
 chown -R $USERNAME:$USERNAME /home/$USERNAME/.rtorrent.rc
@@ -236,6 +237,8 @@ rm -r /tmp/nginx-1.8.0*
 mkdir -p /var/www
 chown www-data:www-data /var/www
 addgroup nginx www-data
+addgroup $USERNAME www-data
+chmod g+s /var/www
 
 ## Star nginx on restart
 #wget -O /etc/init.d/nginx https://gist.github.com/sairam/5892520/raw/b8195a71e944d46271c8a49f2717f70bcd04bf1a/etc-init.d-nginx
