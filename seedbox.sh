@@ -402,3 +402,4 @@ http {
 }
 EOF
 service nginx reload
+service rtorrent start
